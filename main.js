@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             snake.pop();
         }
-    }
+    } // awdawd
  
     function generateFood() {
         food = {
