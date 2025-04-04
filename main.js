@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameOver();
                 return;
             }
-        }
+        } // Check for collision with itself
  
         snake.unshift(head);
  
