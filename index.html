@@ -1,28 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-
+ 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snake Game</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Game</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
+ 
 <body>
-    <div id="game-container">
-        <button id="start-btn">Start Game</button>
-        <canvas id="game-canvas"></canvas>
-        <div id="score-display"></div>
-        <div id="best-score-display"></div>
-        <button id="reset-best-btn">Reset Best Score</button>
-        <div id="game-over" style="display: none;">
-            Game Over
-            <div id="final-score">Your Score: 0</div> <!-- Add this to show the player's final score -->
-            <div id="best-score-end">Best Score: 0</div> <!-- This will show the best score -->
-            <button id="restart-btn" style="display: none;">Restart</button>
-        </div>        
+  <!-- Game Rules (Left Side) -->
+  <div id="game-rules">
+    <h2>🐍 How to Play</h2>
+    <ul>
+      <li><strong>Start Game:</strong> Click "Start Game" or press <kbd>Space</kbd>.</li>
+      <li><strong>Pause/Resume:</strong> Press <kbd>Space</kbd> again to pause or resume.</li>
+      <li><strong>Move:</strong> Use <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> or Arrow Keys.</li>
+      <li><strong>Collect Food:</strong> Eat 🍎, 🍭, or 🍕 to score and grow.</li>
+      <li><strong>Avoid:</strong> Don’t hit the walls or yourself.</li>
+      <li><strong>Speed Up:</strong> Snake speeds up every 5 points.</li>
+      <li><strong>Best Score:</strong> Saved automatically.</li>
+      <li><strong>Reset:</strong> Click "Reset Best Score" to clear.</li>
+    </ul>
+  </div>
+ 
+  <!-- Game Container (Right Side) -->
+  <div id="game-container">
+    <button id="start-btn">Start Game</button>
+    <canvas id="game-canvas"></canvas>
+    <div id="score-display"></div>
+    <div id="best-score-display"></div>
+    <button id="reset-best-btn">Reset Best Score</button>
+    <div id="game-over" style="display: none;">
+      Game Over
+      <div id="final-score">Your Score: 0</div>
+      <div id="best-score-end">Best Score: 0</div>
+      <button id="restart-btn" style="display: none;">Restart</button>
     </div>
-    <script src="main.js"></script>
+  </div>
+ 
+  <script src="main.js"></script>
 </body>
-
+ 
 </html>
+ 
+ 
