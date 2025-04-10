@@ -40,17 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
    
     function drawFood() {
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.8)'; // Slightly transparent red
-        ctx.beginPath();
-        ctx.arc(
-            food.x * gridSize + gridSize / 2,
-            food.y * gridSize + gridSize / 2,
-            gridSize / 2,
-            0,
-            Math.PI * 2
-        );
-        ctx.fill();
+        ctx.font = `${gridSize}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🍎', food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2);
     }
+    
  
     // Game logic
     function moveSnake() {
