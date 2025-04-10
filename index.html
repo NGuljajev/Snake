@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
- 
+
 <body>
     <div id="game-container">
         <button id="start-btn">Start Game</button>
         <canvas id="game-canvas"></canvas>
         <div id="score-display"></div>
-        <div id="game-over" style="display: none;">Game Over
+        <div id="best-score-display"></div>
+        <button id="reset-best-btn">Reset Best Score</button>
+        <div id="game-over" style="display: none;">
+            Game Over<br>
+            <small>Press Space or click Restart</small>
             <button id="restart-btn" style="display: none;">Restart</button>
         </div>
     </div>
     <script src="main.js"></script>
 </body>
- 
+
 </html>
- 
