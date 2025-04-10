@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // Game variables
+    let gamePaused = false;
     let snake = [{ x: 10, y: 10 }];
     let food = {};
     let xVelocity = 0;
@@ -40,10 +41,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawSnake() {
-        ctx.fillStyle = '#00FF00';
-        snake.forEach(segment => {
+        if (snake.length === 0) return;
+    
+        // Draw head (different color)
+        const head = snake[0];
+        ctx.fillStyle = '#00FF00'; // Bright green head
+        ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
+        
+        // Draw body with gradient
+        for (let i = 1; i < snake.length - 1; i++) {
+            const segment = snake[i];
+            const progress = i / snake.length;
+            const g = Math.floor(150 + 105 * (1 - progress)); // 150-255 green range
+            
+            ctx.fillStyle = `rgb(0, ${g}, 0)`;
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-        });
+        }
+        
+        // Draw tail (darkest)
+        if (snake.length > 1) {
+            const tail = snake[snake.length - 1];
+            ctx.fillStyle = '#006600';
+            ctx.fillRect(tail.x * gridSize, tail.y * gridSize, gridSize, gridSize);
+        }
     }
 
     function drawFood() {
@@ -153,7 +173,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Controls
+
+    // Modify the keydown event listener
     document.addEventListener('keydown', (e) => {
+        // Spacebar handling
+        if (e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar') {
+            if (!gameRunning) {
+                startGame();
+                return;
+            } else {
+                // Toggle pause when game is running
+                togglePause();
+                return;
+            }
+        }
+
+        // Ignore movement keys if game isn't running or is paused
+        if (!gameRunning || gamePaused) return;
+
+        // Movement controls
         switch (e.key) {
             case 'w':
             case 'ArrowUp':
@@ -179,15 +217,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 xVelocity = 1;
                 yVelocity = 0;
                 break;
-            case ' ':
-            case 'Space':
-            case 'Spacebar':
-                if (!gameRunning && gameOverDisplay.style.display === 'flex') {
-                    startGame();
-                }
-                break;
         }
     });
+
+    // Add these new functions
+    function togglePause() {
+        gamePaused = !gamePaused;
+
+        if (gamePaused) {
+            clearInterval(gameLoop);
+            drawPauseScreen();
+        } else {
+            gameLoop = setInterval(updateGame, gameSpeed);
+        }
+    }
+
+    function drawPauseScreen() {
+        // Darken the game
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw pause text
+        ctx.fillStyle = 'white';
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+        ctx.font = '20px Arial';
+        ctx.fillText('Press SPACE to continue', canvas.width / 2, canvas.height / 2 + 40);
+    }
+
+    // Modify the updateGame function
+    function updateGame() {
+        if (gameRunning && !gamePaused) {
+            moveSnake();
+            drawGame();
+        }
+    }
 
     // Button events
     startBtn.addEventListener('click', startGame);
