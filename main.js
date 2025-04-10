@@ -2,10 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('game-canvas');
     const ctx = canvas.getContext('2d');
     const scoreDisplay = document.getElementById('score-display');
-    const bestScoreDisplay = document.getElementById('best-score-display'); // NEW
+    const bestScoreDisplay = document.getElementById('best-score-display');
     const gameOverDisplay = document.getElementById('game-over');
     const restartBtn = document.getElementById('restart-btn');
     const startBtn = document.getElementById('start-btn');
+    const resetBestBtn = document.getElementById('reset-best-btn');
 
     // Game settings
     const gridSize = 20;
@@ -13,31 +14,35 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.width = gridSize * tileCount;
     canvas.height = gridSize * tileCount;
 
+    // Food types
+    const foodTypes = [
+        { name: 'apple', emoji: '🍎', points: 1 },
+        { name: 'lollipop', emoji: '🍭', points: 1 },
+        { name: 'pizza', emoji: '🍕', points: 1 }
+    ];
+
     // Game variables
     let snake = [{ x: 10, y: 10 }];
     let food = {};
     let xVelocity = 0;
     let yVelocity = 0;
     let score = 0;
-    let bestScore = localStorage.getItem('bestScore') || 0; // NEW
+    let bestScore = localStorage.getItem('bestScore') || 0;
     let gameRunning = false;
     let gameSpeed = 150;
     let gameLoop;
 
     // Draw functions
     function drawGame() {
-        // Clear the canvas without covering the background
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawFood();
         drawSnake();
     }
 
     function drawSnake() {
-        ctx.fillStyle = 'rgba(0, 255, 0, 0.8)'; // Slightly transparent lime
+        ctx.fillStyle = '#00FF00';
         snake.forEach(segment => {
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-            ctx.strokeRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
         });
     }
 
@@ -45,9 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.font = `${gridSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('🍎', food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2);
+        ctx.fillText(food.emoji, food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2);
     }
-
 
     // Game logic
     function moveSnake() {
@@ -70,10 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
         snake.unshift(head);
 
         if (head.x === food.x && head.y === food.y) {
-            score++;
+            score += food.points;
             scoreDisplay.textContent = `Score: ${score}`;
 
-            // 🏆 Update best score
             if (score > bestScore) {
                 bestScore = score;
                 localStorage.setItem('bestScore', bestScore);
@@ -93,25 +96,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateFood() {
-        food = {
+        const type = foodTypes[Math.floor(Math.random() * foodTypes.length)];
+        const newFood = {
+            ...type,
             x: Math.floor(Math.random() * tileCount),
             y: Math.floor(Math.random() * tileCount)
         };
 
         for (let i = 0; i < snake.length; i++) {
-            if (food.x === snake[i].x && food.y === snake[i].y) {
+            if (newFood.x === snake[i].x && newFood.y === snake[i].y) {
                 generateFood();
                 return;
             }
         }
+
+        food = newFood;
     }
 
     function gameOver() {
-        console.log('Game Over! Snake:', snake, 'Food:', food, 'Velocity:', xVelocity, yVelocity);
         gameRunning = false;
         clearInterval(gameLoop);
+
         gameOverDisplay.style.display = 'flex';
         restartBtn.style.display = 'block';
+
+        const finalScoreDisplay = document.getElementById('final-score');
+        finalScoreDisplay.textContent = `Your Score: ${score}`;
+
+        const bestScoreDisplayEnd = document.getElementById('best-score-end');
+        bestScoreDisplayEnd.textContent = `Best Score: ${bestScore}`;
     }
 
     function updateGame() {
@@ -139,51 +152,33 @@ document.addEventListener('DOMContentLoaded', () => {
         gameLoop = setInterval(updateGame, gameSpeed);
     }
 
-
-    // Event listeners
+    // Controls
     document.addEventListener('keydown', (e) => {
         switch (e.key) {
             case 'w':
-                if (yVelocity === 1) return;
-                xVelocity = 0;
-                yVelocity = -1;
-                break;
-            case 's':
-                if (yVelocity === -1) return;
-                xVelocity = 0;
-                yVelocity = 1;
-                break;
-            case 'a':
-                if (xVelocity === 1) return;
-                xVelocity = -1;
-                yVelocity = 0;
-                break;
-            case 'd':
-                if (xVelocity === -1) return;
-                xVelocity = 1;
-                yVelocity = 0;
-                break;
             case 'ArrowUp':
                 if (yVelocity === 1) return;
                 xVelocity = 0;
                 yVelocity = -1;
                 break;
+            case 's':
             case 'ArrowDown':
                 if (yVelocity === -1) return;
                 xVelocity = 0;
                 yVelocity = 1;
                 break;
+            case 'a':
             case 'ArrowLeft':
                 if (xVelocity === 1) return;
                 xVelocity = -1;
                 yVelocity = 0;
                 break;
+            case 'd':
             case 'ArrowRight':
                 if (xVelocity === -1) return;
                 xVelocity = 1;
                 yVelocity = 0;
                 break;
-
             case ' ':
             case 'Space':
             case 'Spacebar':
@@ -194,11 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    startBtn.addEventListener('click', startGame); // Start game on button click
+    // Button events
+    startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
-
-    const resetBestBtn = document.getElementById('reset-best-btn');
-
     resetBestBtn.addEventListener('click', () => {
         localStorage.removeItem('bestScore');
         bestScore = 0;
