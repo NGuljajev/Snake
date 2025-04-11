@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartBtn = document.getElementById('restart-btn');
     const startBtn = document.getElementById('start-btn');
     const resetBestBtn = document.getElementById('reset-best-btn');
+    const moneyDisplay = document.getElementById('money-display');
+    const shopBtn = document.getElementById('shop-btn');
+    const shopMenu = document.getElementById('shop-menu');
 
     // Game settings
     const gridSize = 20;
@@ -88,18 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameRunning = false;
     let gameSpeed = 150;
     let gameLoop;
-
-    // Add a money variable and snake color
     let money = 0;
-    let snakeColor = { name: 'Default', color: '#00FF00', multiplier: 1 };
-
-    // Add a shop with snake colors
+    
+    // Snake color options
     const shop = [
         { name: 'Default', color: '#00FF00', multiplier: 1, cost: 0 },
-        { name: 'Gold', color: '#FFD700', multiplier: 2, cost: 50 },
-        { name: 'Blue', color: '#0000FF', multiplier: 1.5, cost: 30 },
-        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 20 },
+        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 50 },
+        { name: 'Blue', color: '#0000FF', multiplier: 1.5, cost: 100 },
+        { name: 'Gold', color: '#FFD700', multiplier: 2, cost: 150 },
     ];
+    
+    let snakeColor = shop[0];
 
     // Draw functions
     function drawGame() {
@@ -108,21 +110,19 @@ document.addEventListener('DOMContentLoaded', () => {
         drawSnake();
     }
 
-    // Update the drawSnake function to use the current snake color
     function drawSnake() {
         if (snake.length === 0) return;
 
         // Draw head (different color)
         const head = snake[0];
-        ctx.fillStyle = snakeColor.color; // Use the current snake color
+        ctx.fillStyle = snakeColor.color;
         ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
 
         // Draw body with gradient
         for (let i = 1; i < snake.length - 1; i++) {
             const segment = snake[i];
             const progress = i / snake.length;
-            const g = Math.floor(150 + 105 * (1 - progress)); // 150-255 green range
-
+            const g = Math.floor(150 + 105 * (1 - progress));
             ctx.fillStyle = `rgb(0, ${g}, 0)`;
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
         }
@@ -143,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Game logic
-    // Update the moveSnake function to add money
     function moveSnake() {
         const head = { x: snake[0].x + xVelocity, y: snake[0].y + yVelocity };
 
@@ -165,9 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (head.x === food.x && head.y === food.y) {
             score += food.points;
-            money += food.points * snakeColor.multiplier; // Add money based on multiplier
+            money += Math.floor(food.points * snakeColor.multiplier);
             scoreDisplay.textContent = `Score: ${score}`;
-            document.getElementById('money-display').textContent = `💰 Money: ${money}`;
+            moneyDisplay.textContent = `💰 Money: ${money}`;
 
             if (score > bestScore) {
                 bestScore = score;
@@ -212,14 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverDisplay.style.display = 'flex';
         restartBtn.style.display = 'block';
 
-        const finalScoreDisplay = document.getElementById('final-score');
-        finalScoreDisplay.textContent = `Your Score: ${score}`;
-
-        const bestScoreDisplayEnd = document.getElementById('best-score-end');
-        bestScoreDisplayEnd.textContent = `Best Score: ${bestScore}`;
+        document.getElementById('final-score').textContent = `Your Score: ${score}`;
+        document.getElementById('best-score-end').textContent = `Best Score: ${bestScore}`;
     }
 
-    // Modify the updateGame function
     function updateGame() {
         if (gameRunning && !gamePaused) {
             moveSnake();
@@ -227,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Modify the startGame function
     function startGame() {
         snake = [{ x: 10, y: 10 }];
         xVelocity = 1;
@@ -239,12 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameRunning = true;
         gameOverDisplay.style.display = 'none';
         restartBtn.style.display = 'none';
-
-        // Hide the start button
-        const startBtn = document.getElementById('start-btn');
-        if (startBtn) {
-            startBtn.style.display = 'none';
-        }
+        startBtn.style.display = 'none';
 
         generateFood();
 
@@ -252,9 +241,61 @@ document.addEventListener('DOMContentLoaded', () => {
         gameLoop = setInterval(updateGame, gameSpeed);
     }
 
-    // Controls
+    function togglePause() {
+        gamePaused = !gamePaused;
 
-    // Modify the keydown event listener
+        if (gamePaused) {
+            clearInterval(gameLoop);
+            drawPauseScreen();
+        } else {
+            gameLoop = setInterval(updateGame, gameSpeed);
+        }
+    }
+
+    function drawPauseScreen() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = 'white';
+        ctx.font = '30px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+        ctx.font = '20px Arial';
+        ctx.fillText('Press SPACE to continue', canvas.width / 2, canvas.height / 2 + 40);
+    }
+
+    function populateShopMenu() {
+        shopMenu.innerHTML = '<h3>Snake Colors</h3>';
+        
+        shop.forEach((item) => {
+            const button = document.createElement('button');
+            button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
+            button.style.backgroundColor = item.color;
+            button.disabled = money < item.cost || snakeColor.name === item.name;
+
+            button.addEventListener('click', () => {
+                if (money >= item.cost) {
+                    money -= item.cost;
+                    snakeColor = item;
+                    moneyDisplay.textContent = `💰 Money: ${money}`;
+                    populateShopMenu();
+                }
+            });
+
+            shopMenu.appendChild(button);
+        });
+    }
+
+    function toggleShopMenu() {
+        if (shopMenu.style.display === 'none' || shopMenu.style.display === '') {
+            populateShopMenu();
+            shopMenu.style.display = 'block';
+        } else {
+            shopMenu.style.display = 'none';
+        }
+    }
+
+    // Event listeners
     document.addEventListener('keydown', (e) => {
         // Spacebar handling
         if (e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar') {
@@ -262,7 +303,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 startGame();
                 return;
             } else {
-                // Toggle pause when game is running
                 togglePause();
                 return;
             }
@@ -300,138 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Add these new functions
-    function togglePause() {
-        gamePaused = !gamePaused;
-
-        if (gamePaused) {
-            clearInterval(gameLoop);
-            drawPauseScreen();
-        } else {
-            gameLoop = setInterval(updateGame, gameSpeed);
-        }
-    }
-
-    function drawPauseScreen() {
-        // Darken the game
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw pause text
-        ctx.fillStyle = 'white';
-        ctx.font = '30px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
-        ctx.font = '20px Arial';
-        ctx.fillText('Press SPACE to continue', canvas.width / 2, canvas.height / 2 + 40);
-    }
-
-    // Add a shop UI
-    function openShop() {
-        const shopContainer = document.getElementById('shop-container');
-        shopContainer.innerHTML = '<h2>Shop</h2>';
-
-        shop.forEach((item) => {
-            const button = document.createElement('button');
-            button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
-            button.style.backgroundColor = item.color;
-            button.disabled = money < item.cost || snakeColor.name === item.name;
-
-            button.addEventListener('click', () => {
-                if (money >= item.cost) {
-                    money -= item.cost;
-                    snakeColor = item;
-                    document.getElementById('money-display').textContent = `💰 Money: ${money}`;
-                    openShop();
-                }
-            });
-
-            shopContainer.appendChild(button);
-        });
-    }
-
-     // Create the shop menu container
-     const shopMenu = document.createElement('div');
-     shopMenu.id = 'shop-menu';
-     shopMenu.style.display = 'none'; // Initially hidden
-     shopMenu.style.position = 'absolute';
-     shopMenu.style.top = '50px'; // Adjust position as needed
-     shopMenu.style.right = '10px';
-     shopMenu.style.backgroundColor = '#333';
-     shopMenu.style.color = 'white';
-     shopMenu.style.padding = '10px';
-     shopMenu.style.border = '1px solid #444';
-     shopMenu.style.borderRadius = '5px';
-     shopMenu.style.zIndex = '1000';
-     document.body.appendChild(shopMenu);
-
-    // Toggle the shop menu visibility
-    function toggleShopMenu() {
-        if (shopMenu.style.display === 'none') {
-            populateShopMenu(); // Populate the menu when opening
-            shopMenu.style.display = 'block';
-        } else {
-            shopMenu.style.display = 'none';
-        }
-    }
-
-    // Add a button to open the shop
-    const shopBtn = document.createElement('button');
-    shopBtn.innerHTML = '🛒 Shop';
-    shopBtn.style.position = 'absolute';
-    shopBtn.style.top = '10px';
-    shopBtn.style.right = '10px';
-    shopBtn.style.padding = '10px 20px';
-    shopBtn.style.fontSize = '16px';
-    shopBtn.style.cursor = 'pointer';
-    shopBtn.style.border = 'none';
-    shopBtn.style.borderRadius = '5px';
-    shopBtn.style.backgroundColor = '#4CAF50';
-    shopBtn.style.color = 'white';
-    shopBtn.addEventListener('click', toggleShopMenu);
-    document.body.appendChild(shopBtn);
-
-    // Add a money display
-    const moneyDisplay = document.createElement('div');
-    moneyDisplay.id = 'money-display';
-    moneyDisplay.textContent = `💰 Money: ${money}`;
-    moneyDisplay.style.position = 'absolute';
-    moneyDisplay.style.top = '50px';
-    moneyDisplay.style.right = '10px';
-    moneyDisplay.style.color = 'white';
-    document.body.appendChild(moneyDisplay);
-
-
-    // Populate the shop menu with items
-    function populateShopMenu() {
-        shopMenu.innerHTML = ''; // Clear previous items
-    
-        shop.forEach((item) => {
-            const button = document.createElement('button');
-            button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
-            button.style.backgroundColor = item.color;
-            button.style.color = 'white';
-            button.style.border = 'none';
-            button.style.padding = '5px 10px';
-            button.style.margin = '5px 0';
-            button.style.cursor = 'pointer';
-            button.style.width = '100%';
-            button.disabled = money < item.cost || snakeColor.name === item.name;
-    
-            button.addEventListener('click', () => {
-                if (money >= item.cost) {
-                    money -= item.cost;
-                    snakeColor = item;
-                    document.getElementById('money-display').textContent = `💰 Money: ${money}`;
-                    populateShopMenu(); // Refresh the shop menu
-                }
-            });
-    
-            shopMenu.appendChild(button);
-        });
-    }
-
-    // Close the shop menu when clicking outside
     document.addEventListener('click', (e) => {
         if (!shopBtn.contains(e.target) && !shopMenu.contains(e.target)) {
             shopMenu.style.display = 'none';
@@ -446,6 +354,9 @@ document.addEventListener('DOMContentLoaded', () => {
         bestScore = 0;
         bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     });
-});
+    shopBtn.addEventListener('click', toggleShopMenu);
 
-// tere
+    // Initialize displays
+    bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
+    moneyDisplay.textContent = `💰 Money: ${money}`;
+});

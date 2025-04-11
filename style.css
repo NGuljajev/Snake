@@ -203,3 +203,71 @@ body {
 #money-display {
   color: white;
 }
+
+/* Add these styles to your CSS */
+#right-sidebar {
+  position: fixed;
+  right: 20px;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 100;
+}
+
+#money-display {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  font-size: 18px;
+  text-align: center;
+}
+
+#shop-btn {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#shop-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+#shop-menu {
+  background-color: rgba(0, 0, 0, 0.85);
+  border-radius: 5px;
+  padding: 15px;
+  color: white;
+  width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#shop-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#shop-menu button:hover {
+  background-color: #444;
+}
+
+#shop-menu button:disabled {
+  background-color: #222;
+  color: #666;
+  cursor: not-allowed;
+}

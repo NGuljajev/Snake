@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
- 
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
- 
+
 <body>
   <!-- Game Rules (Left Side) -->
   <div id="game-rules">
@@ -23,7 +23,14 @@
       <li><strong>Reset:</strong> Click "Reset Best Score" to clear.</li>
     </ul>
   </div>
- 
+
+  <!-- Add this right after the game-rules div -->
+  <div id="right-sidebar">
+    <div id="money-display">💰 Money: 0</div>
+    <button id="shop-btn">🛒 Shop</button>
+    <div id="shop-menu" style="display: none;"></div>
+  </div>
+
   <!-- Game Container (Right Side) -->
   <div id="game-container">
     <button id="start-btn">Start Game</button>
@@ -38,10 +45,8 @@
       <button id="restart-btn" style="display: none;">Restart</button>
     </div>
   </div>
- 
+
   <script src="main.js"></script>
 </body>
- 
+
 </html>
- 
- 
