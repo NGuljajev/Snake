@@ -319,3 +319,5 @@ document.addEventListener('DOMContentLoaded', () => {
         bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     });
 });
+
+// tere
