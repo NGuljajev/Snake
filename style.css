@@ -66,7 +66,7 @@ body {
   background-color: #d32f2f;
 }
  
-#start-btn,
+
 #restart-btn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -137,4 +137,65 @@ body {
   margin-bottom: 8px;
 }
  
- 
+
+/* Center the start button */
+#start-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 12px 25px;
+  font-size: 18px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensure it appears above the canvas */
+}
+
+#start-btn:hover {
+  transform: translate(-50%, -50%) translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background-color: #45a049;
+}
+
+#start-btn:active {
+  transform: translate(-50%, -50%) translateY(1px);
+}
+
+/* Style the shop container */
+#shop-container {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  border: 2px solid #ccc;
+  padding: 20px;
+  border-radius: 10px;
+  display: none; /* Initially hidden */
+  z-index: 1000;
+}
+
+#shop-container h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+#shop-container button {
+  display: block;
+  margin: 5px auto;
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+#shop-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

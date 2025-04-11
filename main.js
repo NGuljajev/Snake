@@ -89,6 +89,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameSpeed = 150;
     let gameLoop;
 
+    // Add a money variable and snake color
+    let money = 0;
+    let snakeColor = { name: 'Default', color: '#00FF00', multiplier: 1 };
+
+    // Add a shop with snake colors
+    const shop = [
+        { name: 'Default', color: '#00FF00', multiplier: 1, cost: 0 },
+        { name: 'Gold', color: '#FFD700', multiplier: 2, cost: 50 },
+        { name: 'Blue', color: '#0000FF', multiplier: 1.5, cost: 30 },
+        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 20 },
+    ];
+
     // Draw functions
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -96,12 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
         drawSnake();
     }
 
+    // Update the drawSnake function to use the current snake color
     function drawSnake() {
         if (snake.length === 0) return;
     
         // Draw head (different color)
         const head = snake[0];
-        ctx.fillStyle = '#00FF00'; // Bright green head
+        ctx.fillStyle = snakeColor.color; // Use the current snake color
         ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
         
         // Draw body with gradient
@@ -130,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Game logic
+    // Update the moveSnake function to add money
     function moveSnake() {
         const head = { x: snake[0].x + xVelocity, y: snake[0].y + yVelocity };
 
@@ -151,7 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (head.x === food.x && head.y === food.y) {
             score += food.points;
+            money += food.points * snakeColor.multiplier; // Add money based on multiplier
             scoreDisplay.textContent = `Score: ${score}`;
+            document.getElementById('money-display').textContent = `💰 Money: ${money}`;
 
             if (score > bestScore) {
                 bestScore = score;
@@ -203,13 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
         bestScoreDisplayEnd.textContent = `Best Score: ${bestScore}`;
     }
 
+    // Modify the updateGame function
     function updateGame() {
-        if (gameRunning) {
+        if (gameRunning && !gamePaused) {
             moveSnake();
             drawGame();
         }
     }
 
+    // Modify the startGame function
     function startGame() {
         snake = [{ x: 10, y: 10 }];
         xVelocity = 1;
@@ -221,6 +239,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameRunning = true;
         gameOverDisplay.style.display = 'none';
         restartBtn.style.display = 'none';
+
+        // Hide the start button
+        const startBtn = document.getElementById('start-btn');
+        if (startBtn) {
+            startBtn.style.display = 'none';
+        }
 
         generateFood();
 
@@ -302,13 +326,41 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText('Press SPACE to continue', canvas.width / 2, canvas.height / 2 + 40);
     }
 
-    // Modify the updateGame function
-    function updateGame() {
-        if (gameRunning && !gamePaused) {
-            moveSnake();
-            drawGame();
-        }
+    // Add a shop UI
+    function openShop() {
+        const shopContainer = document.getElementById('shop-container');
+        shopContainer.innerHTML = '<h2>Shop</h2>';
+
+        shop.forEach((item) => {
+            const button = document.createElement('button');
+            button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
+            button.style.backgroundColor = item.color;
+            button.disabled = money < item.cost || snakeColor.name === item.name;
+
+            button.addEventListener('click', () => {
+                if (money >= item.cost) {
+                    money -= item.cost;
+                    snakeColor = item;
+                    document.getElementById('money-display').textContent = `💰 Money: ${money}`;
+                    openShop();
+                }
+            });
+
+            shopContainer.appendChild(button);
+        });
     }
+
+    // Add a button to open the shop
+    const shopBtn = document.createElement('button');
+    shopBtn.textContent = 'Shop';
+    shopBtn.addEventListener('click', openShop);
+    document.body.appendChild(shopBtn);
+
+    // Add a money display
+    const moneyDisplay = document.createElement('div');
+    moneyDisplay.id = 'money-display';
+    moneyDisplay.textContent = `💰 Money: ${money}`;
+    document.body.appendChild(moneyDisplay);
 
     // Button events
     startBtn.addEventListener('click', startGame);
