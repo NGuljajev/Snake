@@ -111,22 +111,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update the drawSnake function to use the current snake color
     function drawSnake() {
         if (snake.length === 0) return;
-    
+
         // Draw head (different color)
         const head = snake[0];
         ctx.fillStyle = snakeColor.color; // Use the current snake color
         ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
-        
+
         // Draw body with gradient
         for (let i = 1; i < snake.length - 1; i++) {
             const segment = snake[i];
             const progress = i / snake.length;
             const g = Math.floor(150 + 105 * (1 - progress)); // 150-255 green range
-            
+
             ctx.fillStyle = `rgb(0, ${g}, 0)`;
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
         }
-        
+
         // Draw tail (darkest)
         if (snake.length > 1) {
             const tail = snake[snake.length - 1];
@@ -350,10 +350,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+     // Create the shop menu container
+     const shopMenu = document.createElement('div');
+     shopMenu.id = 'shop-menu';
+     shopMenu.style.display = 'none'; // Initially hidden
+     shopMenu.style.position = 'absolute';
+     shopMenu.style.top = '100%'; // Position below the shop button
+     shopMenu.style.left = '0';
+     shopMenu.style.backgroundColor = '#333';
+     shopMenu.style.color = 'white';
+     shopMenu.style.padding = '10px';
+     shopMenu.style.border = '1px solid #444';
+     shopMenu.style.borderRadius = '5px';
+     shopMenu.style.zIndex = '1000';
+     document.body.appendChild(shopMenu);
+
+    // Toggle the shop menu visibility
+    function toggleShopMenu() {
+        if (shopMenu.style.display === 'none') {
+            populateShopMenu(); // Populate the menu when opening
+            shopMenu.style.display = 'block';
+        } else {
+            shopMenu.style.display = 'none';
+        }
+    }
+
     // Add a button to open the shop
     const shopBtn = document.createElement('button');
-    shopBtn.textContent = 'Shop';
-    shopBtn.addEventListener('click', openShop);
+    shopBtn.innerHTML = '🛒 <span style="color: green;">Shop</span>'; // Add green shopping cart icon
+    shopBtn.style.position = 'relative';
+    shopBtn.addEventListener('click', toggleShopMenu);
     document.body.appendChild(shopBtn);
 
     // Add a money display
@@ -361,6 +387,43 @@ document.addEventListener('DOMContentLoaded', () => {
     moneyDisplay.id = 'money-display';
     moneyDisplay.textContent = `💰 Money: ${money}`;
     document.body.appendChild(moneyDisplay);
+
+
+    // Populate the shop menu with items
+    function populateShopMenu() {
+        shopMenu.innerHTML = ''; // Clear previous items
+    
+        shop.forEach((item) => {
+            const button = document.createElement('button');
+            button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
+            button.style.backgroundColor = item.color;
+            button.style.color = 'white';
+            button.style.border = 'none';
+            button.style.padding = '5px 10px';
+            button.style.margin = '5px 0';
+            button.style.cursor = 'pointer';
+            button.style.width = '100%';
+            button.disabled = money < item.cost || snakeColor.name === item.name;
+    
+            button.addEventListener('click', () => {
+                if (money >= item.cost) {
+                    money -= item.cost;
+                    snakeColor = item;
+                    document.getElementById('money-display').textContent = `💰 Money: ${money}`;
+                    populateShopMenu(); // Refresh the shop menu
+                }
+            });
+    
+            shopMenu.appendChild(button);
+        });
+    }
+
+    // Close the shop menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!shopBtn.contains(e.target) && !shopMenu.contains(e.target)) {
+            shopMenu.style.display = 'none';
+        }
+    });
 
     // Button events
     startBtn.addEventListener('click', startGame);

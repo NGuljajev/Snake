@@ -199,3 +199,7 @@ body {
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+#money-display {
+  color: white;
+}
