@@ -355,8 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
      shopMenu.id = 'shop-menu';
      shopMenu.style.display = 'none'; // Initially hidden
      shopMenu.style.position = 'absolute';
-     shopMenu.style.top = '100%'; // Position below the shop button
-     shopMenu.style.left = '0';
+     shopMenu.style.top = '50px'; // Adjust position as needed
+     shopMenu.style.right = '10px';
      shopMenu.style.backgroundColor = '#333';
      shopMenu.style.color = 'white';
      shopMenu.style.padding = '10px';
@@ -377,8 +377,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add a button to open the shop
     const shopBtn = document.createElement('button');
-    shopBtn.innerHTML = '🛒 <span style="color: green;">Shop</span>'; // Add green shopping cart icon
-    shopBtn.style.position = 'relative';
+    shopBtn.innerHTML = '🛒 Shop';
+    shopBtn.style.position = 'absolute';
+    shopBtn.style.top = '10px';
+    shopBtn.style.right = '10px';
+    shopBtn.style.padding = '10px 20px';
+    shopBtn.style.fontSize = '16px';
+    shopBtn.style.cursor = 'pointer';
+    shopBtn.style.border = 'none';
+    shopBtn.style.borderRadius = '5px';
+    shopBtn.style.backgroundColor = '#4CAF50';
+    shopBtn.style.color = 'white';
     shopBtn.addEventListener('click', toggleShopMenu);
     document.body.appendChild(shopBtn);
 
@@ -386,6 +395,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const moneyDisplay = document.createElement('div');
     moneyDisplay.id = 'money-display';
     moneyDisplay.textContent = `💰 Money: ${money}`;
+    moneyDisplay.style.position = 'absolute';
+    moneyDisplay.style.top = '50px';
+    moneyDisplay.style.right = '10px';
+    moneyDisplay.style.color = 'white';
     document.body.appendChild(moneyDisplay);
 
 
