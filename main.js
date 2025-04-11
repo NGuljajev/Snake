@@ -17,69 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.width = gridSize * tileCount;
     canvas.height = gridSize * tileCount;
 
-    // Food types
-    const foodTypes = [
-        // fruits
-        { name: 'redapple', emoji: '🍎', points: 1 },
-        { name: 'watermelon', emoji: '🍉', points: 1 },
-        { name: 'kiwi', emoji: '🥝', points: 1 },
-        { name: 'grapes', emoji: '🍇', points: 1 },
-        { name: 'melon', emoji: '🍈', points: 1 },
-        { name: 'lemon', emoji: '🍋', points: 1 },
-        { name: 'orange', emoji: '🍊', points: 1 },
-        { name: 'lime', emoji: '🍋‍🟩', points: 1 },
-        { name: 'banana', emoji: '🍌', points: 1 },
-        { name: 'pineapple', emoji: '🍍', points: 1 },
-        { name: 'mango', emoji: '🥭', points: 1 },
-        { name: 'greenapple', emoji: '🍏', points: 1 },
-        { name: 'pear', emoji: '🍐', points: 1 },
-        { name: 'peach', emoji: '🍑', points: 1 },
-        { name: 'cherries', emoji: '🍒', points: 1 },
-        { name: 'strawberry', emoji: '🍓', points: 1 },
-        { name: 'blueberries', emoji: '🫐', points: 1 },
-        { name: 'tomato', emoji: '🍅', points: 1 },
-        { name: 'olive', emoji: '🫒', points: 1 },
-        { name: 'coconut', emoji: '🥥', points: 1 },
-
-        // vegetables
-        { name: 'avocado', emoji: '🥑', points: 1 },
-        { name: 'eggplant', emoji: '🍆', points: 1 },
-        { name: 'potato', emoji: '🥔', points: 1 },
-        { name: 'carrot', emoji: '🥕', points: 1 },
-        { name: 'corn', emoji: '🌽', points: 1 },
-        { name: 'hotpepper', emoji: '🌶️', points: 1 },
-        { name: 'bellpepper', emoji: '🫑', points: 1 },
-        { name: 'cucumber', emoji: '🥒', points: 1 },
-        { name: 'leafygreen', emoji: '🥬', points: 1 },
-        { name: 'broccoli', emoji: '🥦', points: 1 },
-        { name: 'garlic', emoji: '🧄', points: 1 },
-        { name: 'peanuts', emoji: '🥜', points: 1 },
-        { name: 'beans', emoji: '🫘', points: 1 },
-        { name: 'chestnut', emoji: '🌰', points: 1 },
-        { name: 'gingerroot', emoji: '🫚', points: 1 },
-        { name: 'peapod', emoji: '🫛', points: 1 },
-        { name: 'brownmushroom', emoji: '🍄‍🟫', points: 1 },
-
-        // prepared foods
-        { name: 'pizza', emoji: '🍕', points: 1 },
-
-        //sweets
-        { name: 'chocolate', emoji: '🍫', points: 1 },
-        { name: 'candy', emoji: '🍬', points: 1 },
-        { name: 'cake', emoji: '🍰', points: 1 },
-        { name: 'softicecream', emoji: '🍦', points: 1 },
-        { name: 'cookie', emoji: '🍪', points: 1 },
-        { name: 'pudding', emoji: '🍮', points: 1 },
-        { name: 'doughnut', emoji: '🍩', points: 1 },
-        { name: 'lollipop', emoji: '🍭', points: 1 },
-        { name: 'shavedice', emoji: '🍧', points: 1 },
-        { name: 'icecream', emoji: '🍨', points: 1 },
-        { name: 'birthdaycake', emoji: '🎂', points: 1 },
-        { name: 'cupcake', emoji: '🧁', points: 1 },
-        { name: 'pie', emoji: '🥧', points: 1 },
-        { name: 'honeypot', emoji: '🍯', points: 1 },
-    ];
-
     // Game variables
     let gamePaused = false;
     let snake = [{ x: 10, y: 10 }];
@@ -92,15 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let gameSpeed = 150;
     let gameLoop;
     let money = 0;
-    
+
     // Snake color options
     const shop = [
         { name: 'Default', color: '#00FF00', multiplier: 1, cost: 0 },
-        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 50 },
+        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 1 },
         { name: 'Blue', color: '#0000FF', multiplier: 1.5, cost: 100 },
         { name: 'Gold', color: '#FFD700', multiplier: 2, cost: 150 },
     ];
-    
+
     let snakeColor = shop[0];
 
     // Draw functions
@@ -113,25 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawSnake() {
         if (snake.length === 0) return;
 
-        // Draw head (different color)
-        const head = snake[0];
+        // Use the selected snake color for the entire snake
         ctx.fillStyle = snakeColor.color;
-        ctx.fillRect(head.x * gridSize, head.y * gridSize, gridSize, gridSize);
 
-        // Draw body with gradient
-        for (let i = 1; i < snake.length - 1; i++) {
+        // Draw each segment of the snake
+        for (let i = 0; i < snake.length; i++) {
             const segment = snake[i];
-            const progress = i / snake.length;
-            const g = Math.floor(150 + 105 * (1 - progress));
-            ctx.fillStyle = `rgb(0, ${g}, 0)`;
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-        }
-
-        // Draw tail (darkest)
-        if (snake.length > 1) {
-            const tail = snake[snake.length - 1];
-            ctx.fillStyle = '#008800';
-            ctx.fillRect(tail.x * gridSize, tail.y * gridSize, gridSize, gridSize);
         }
     }
 
@@ -164,7 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (head.x === food.x && head.y === food.y) {
             score += food.points;
-            money += Math.floor(food.points * snakeColor.multiplier);
+
+            // Fix multiplier calculation
+            money += Math.round(food.points * snakeColor.multiplier);
+
             scoreDisplay.textContent = `Score: ${score}`;
             moneyDisplay.textContent = `💰 Money: ${money}`;
 
@@ -187,11 +115,71 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateFood() {
+        const foodTypes = [
+            { name: 'redapple', emoji: '🍎', points: 1 },
+            { name: 'watermelon', emoji: '🍉', points: 1 },
+            { name: 'kiwi', emoji: '🥝', points: 1 },
+            { name: 'grapes', emoji: '🍇', points: 1 },
+            { name: 'melon', emoji: '🍈', points: 1 },
+            { name: 'lemon', emoji: '🍋', points: 1 },
+            { name: 'orange', emoji: '🍊', points: 1 },
+            { name: 'lime', emoji: '🍋‍🟩', points: 1 },
+            { name: 'banana', emoji: '🍌', points: 1 },
+            { name: 'pineapple', emoji: '🍍', points: 1 },
+            { name: 'mango', emoji: '🥭', points: 1 },
+            { name: 'greenapple', emoji: '🍏', points: 1 },
+            { name: 'pear', emoji: '🍐', points: 1 },
+            { name: 'peach', emoji: '🍑', points: 1 },
+            { name: 'cherries', emoji: '🍒', points: 1 },
+            { name: 'strawberry', emoji: '🍓', points: 1 },
+            { name: 'blueberries', emoji: '🫐', points: 1 },
+            { name: 'tomato', emoji: '🍅', points: 1 },
+            { name: 'olive', emoji: '🫒', points: 1 },
+            { name: 'coconut', emoji: '🥥', points: 1 },
+
+            // vegetables
+            { name: 'avocado', emoji: '🥑', points: 1 },
+            { name: 'eggplant', emoji: '🍆', points: 1 },
+            { name: 'potato', emoji: '🥔', points: 1 },
+            { name: 'carrot', emoji: '🥕', points: 1 },
+            { name: 'corn', emoji: '🌽', points: 1 },
+            { name: 'hotpepper', emoji: '🌶️', points: 1 },
+            { name: 'bellpepper', emoji: '🫑', points: 1 },
+            { name: 'cucumber', emoji: '🥒', points: 1 },
+            { name: 'leafygreen', emoji: '🥬', points: 1 },
+            { name: 'broccoli', emoji: '🥦', points: 1 },
+            { name: 'garlic', emoji: '🧄', points: 1 },
+            { name: 'peanuts', emoji: '🥜', points: 1 },
+            { name: 'beans', emoji: '🫘', points: 1 },
+            { name: 'chestnut', emoji: '🌰', points: 1 },
+            { name: 'gingerroot', emoji: '🫚', points: 1 },
+            { name: 'peapod', emoji: '🫛', points: 1 },
+            { name: 'brownmushroom', emoji: '🍄‍🟫', points: 1 },
+
+            // prepared foods
+            { name: 'pizza', emoji: '🍕', points: 1 },
+
+            //sweets
+            { name: 'chocolate', emoji: '🍫', points: 1 },
+            { name: 'candy', emoji: '🍬', points: 1 },
+            { name: 'cake', emoji: '🍰', points: 1 },
+            { name: 'softicecream', emoji: '🍦', points: 1 },
+            { name: 'cookie', emoji: '🍪', points: 1 },
+            { name: 'pudding', emoji: '🍮', points: 1 },
+            { name: 'doughnut', emoji: '🍩', points: 1 },
+            { name: 'lollipop', emoji: '🍭', points: 1 },
+            { name: 'shavedice', emoji: '🍧', points: 1 },
+            { name: 'icecream', emoji: '🍨', points: 1 },
+            { name: 'birthdaycake', emoji: '🎂', points: 1 },
+            { name: 'cupcake', emoji: '🧁', points: 1 },
+            { name: 'pie', emoji: '🥧', points: 1 },
+            { name: 'honeypot', emoji: '🍯', points: 1 },
+        ];
         const type = foodTypes[Math.floor(Math.random() * foodTypes.length)];
         const newFood = {
             ...type,
             x: Math.floor(Math.random() * tileCount),
-            y: Math.floor(Math.random() * tileCount)
+            y: Math.floor(Math.random() * tileCount),
         };
 
         for (let i = 0; i < snake.length; i++) {
@@ -266,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateShopMenu() {
         shopMenu.innerHTML = '<h3>Snake Colors</h3>';
-        
+
         shop.forEach((item) => {
             const button = document.createElement('button');
             button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
@@ -297,41 +285,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Event listeners
     document.addEventListener('keydown', (e) => {
-        // Spacebar handling
-        if (e.key === ' ' || e.key === 'Space' || e.key === 'Spacebar') {
+        if (e.key === ' ' || e.key === 'Space') {
             if (!gameRunning) {
                 startGame();
-                return;
             } else {
                 togglePause();
-                return;
             }
         }
 
-        // Ignore movement keys if game isn't running or is paused
         if (!gameRunning || gamePaused) return;
 
-        // Movement controls
         switch (e.key) {
             case 'w':
+            case 'W':
             case 'ArrowUp':
                 if (yVelocity === 1) return;
                 xVelocity = 0;
                 yVelocity = -1;
                 break;
             case 's':
+            case '':
             case 'ArrowDown':
                 if (yVelocity === -1) return;
                 xVelocity = 0;
                 yVelocity = 1;
                 break;
             case 'a':
+            case 'A':
             case 'ArrowLeft':
                 if (xVelocity === 1) return;
                 xVelocity = -1;
                 yVelocity = 0;
                 break;
             case 'd':
+            case 'D':
             case 'ArrowRight':
                 if (xVelocity === -1) return;
                 xVelocity = 1;
@@ -346,7 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Button events
     startBtn.addEventListener('click', startGame);
     restartBtn.addEventListener('click', startGame);
     resetBestBtn.addEventListener('click', () => {
@@ -356,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     shopBtn.addEventListener('click', toggleShopMenu);
 
-    // Initialize displays
     bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     moneyDisplay.textContent = `💰 Money: ${money}`;
 });
