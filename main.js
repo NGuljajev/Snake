@@ -11,26 +11,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const shopBtn = document.getElementById('shop-btn');
     const shopMenu = document.getElementById('shop-menu');
 
-    // Game settings
     const gridSize = 20;
     const tileCount = 20;
     canvas.width = gridSize * tileCount;
     canvas.height = gridSize * tileCount;
 
-    // Game variables
     let gamePaused = false;
     let snake = [{ x: 10, y: 10 }];
     let food = {};
     let xVelocity = 0;
     let yVelocity = 0;
     let score = 0;
-    let bestScore = localStorage.getItem('bestScore') || 0;
-    let gameRunning = false;
+    let bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
+    let money = parseInt(localStorage.getItem('money')) || 0;
     let gameSpeed = 150;
     let gameLoop;
-    let money = 0;
+    let gameRunning = false;
 
-    // Snake color options
     const shop = [
         { name: 'Default', color: '#00FF00', multiplier: 1, cost: 0 },
         { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 1 },
@@ -38,9 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'Gold', color: '#FFD700', multiplier: 2, cost: 150 },
     ];
 
-    let snakeColor = shop[0];
+    let boughtColors = JSON.parse(localStorage.getItem('boughtColors')) || ['Default'];
+    let selectedColorName = localStorage.getItem('selectedColor') || 'Default';
+    let snakeColor = shop.find(c => c.name === selectedColorName) || shop[0];
 
-    // Draw functions
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawFood();
@@ -48,38 +46,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function drawSnake() {
-        if (snake.length === 0) return;
-
-        // Use the selected snake color for the entire snake
         ctx.fillStyle = snakeColor.color;
-
-        // Draw each segment of the snake
-        for (let i = 0; i < snake.length; i++) {
-            const segment = snake[i];
+        for (let segment of snake) {
             ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
         }
     }
 
     function drawFood() {
+        if (!food || !food.emoji) return;
         ctx.font = `${gridSize}px Arial`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(food.emoji, food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2);
     }
 
-    // Game logic
     function moveSnake() {
         const head = { x: snake[0].x + xVelocity, y: snake[0].y + yVelocity };
 
-        // Collision with wall
         if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
             gameOver();
             return;
         }
 
-        // Collision with self
-        for (let i = 0; i < snake.length; i++) {
-            if (head.x === snake[i].x && head.y === snake[i].y) {
+        for (let segment of snake) {
+            if (head.x === segment.x && head.y === segment.y) {
                 gameOver();
                 return;
             }
@@ -89,22 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (head.x === food.x && head.y === food.y) {
             score += food.points;
+            money = parseFloat((money + food.points * snakeColor.multiplier).toFixed(1));
 
-            // Fix multiplier calculation
-            money += Math.round(food.points * snakeColor.multiplier);
-
-            scoreDisplay.textContent = `Score: ${score}`;
-            moneyDisplay.textContent = `💰 Money: ${money}`;
-
+        
+            scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
+            moneyDisplay.textContent = `💰 Money: ${money.toFixed(1)}`;
+        
             if (score > bestScore) {
-                bestScore = score;
+                bestScore = Math.floor(score);
                 localStorage.setItem('bestScore', bestScore);
                 bestScoreDisplay.textContent = `Best: ${bestScore}`;
             }
 
             generateFood();
 
-            if (score % 5 === 0 && gameSpeed > 50) {
+            if (Math.floor(score) % 5 === 0 && gameSpeed > 50){
                 gameSpeed -= 10;
                 clearInterval(gameLoop);
                 gameLoop = setInterval(updateGame, gameSpeed);
@@ -115,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateFood() {
-        const foodTypes = [
+                const foodTypes = [
             { name: 'redapple', emoji: '🍎', points: 1 },
             { name: 'watermelon', emoji: '🍉', points: 1 },
             { name: 'kiwi', emoji: '🥝', points: 1 },
@@ -175,17 +164,17 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: 'pie', emoji: '🥧', points: 1 },
             { name: 'honeypot', emoji: '🍯', points: 1 },
         ];
-        const type = foodTypes[Math.floor(Math.random() * foodTypes.length)];
-        const newFood = {
+
+        let type = foodTypes[Math.floor(Math.random() * foodTypes.length)];
+        let newFood = {
             ...type,
             x: Math.floor(Math.random() * tileCount),
             y: Math.floor(Math.random() * tileCount),
         };
 
-        for (let i = 0; i < snake.length; i++) {
-            if (newFood.x === snake[i].x && newFood.y === snake[i].y) {
-                generateFood();
-                return;
+        for (let segment of snake) {
+            if (segment.x === newFood.x && segment.y === newFood.y) {
+                return generateFood();
             }
         }
 
@@ -201,6 +190,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('final-score').textContent = `Your Score: ${score}`;
         document.getElementById('best-score-end').textContent = `Best Score: ${bestScore}`;
+
+        localStorage.setItem('money', money);
     }
 
     function updateGame() {
@@ -243,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function drawPauseScreen() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
         ctx.fillStyle = 'white';
         ctx.font = '30px Arial';
         ctx.textAlign = 'center';
@@ -257,22 +247,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
         shop.forEach((item) => {
             const button = document.createElement('button');
+            const owned = boughtColors.includes(item.name);
+            const selected = snakeColor.name === item.name;
+            const affordable = money >= item.cost;
+
             button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
             button.style.backgroundColor = item.color;
-            button.disabled = money < item.cost || snakeColor.name === item.name;
 
+            // Style for selected
+            if (selected) {
+                button.disabled = true;
+                button.textContent += ' ✔️';
+                button.style.cursor = 'not-allowed';
+                button.style.opacity = '0.6';
+            }
+
+            // Style for not owned and not affordable
+            if (!owned && !affordable) {
+                button.disabled = true;
+                button.style.cursor = 'not-allowed';
+                button.style.opacity = '0.6';
+            }
+
+            // Click logic
             button.addEventListener('click', () => {
-                if (money >= item.cost) {
+                if (!owned && !affordable) return;
+
+                if (!owned) {
                     money -= item.cost;
-                    snakeColor = item;
-                    moneyDisplay.textContent = `💰 Money: ${money}`;
-                    populateShopMenu();
+                    boughtColors.push(item.name);
+                    localStorage.setItem('boughtColors', JSON.stringify(boughtColors));
                 }
+
+                snakeColor = item;
+                localStorage.setItem('selectedColor', item.name);
+                moneyDisplay.textContent = `💰 Money: ${money}`;
+                populateShopMenu();
             });
 
             shopMenu.appendChild(button);
         });
+    drawGame(); 
     }
+
 
     function toggleShopMenu() {
         if (shopMenu.style.display === 'none' || shopMenu.style.display === '') {
@@ -283,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Event listeners
     document.addEventListener('keydown', (e) => {
         if (e.key === ' ' || e.key === 'Space') {
             if (!gameRunning) {
@@ -297,32 +313,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (e.key) {
             case 'w':
-            case 'W':
             case 'ArrowUp':
-                if (yVelocity === 1) return;
-                xVelocity = 0;
-                yVelocity = -1;
+                if (yVelocity !== 1) {
+                    xVelocity = 0;
+                    yVelocity = -1;
+                }
                 break;
             case 's':
-            case '':
             case 'ArrowDown':
-                if (yVelocity === -1) return;
-                xVelocity = 0;
-                yVelocity = 1;
+                if (yVelocity !== -1) {
+                    xVelocity = 0;
+                    yVelocity = 1;
+                }
                 break;
             case 'a':
-            case 'A':
             case 'ArrowLeft':
-                if (xVelocity === 1) return;
-                xVelocity = -1;
-                yVelocity = 0;
+                if (xVelocity !== 1) {
+                    xVelocity = -1;
+                    yVelocity = 0;
+                }
                 break;
             case 'd':
-            case 'D':
             case 'ArrowRight':
-                if (xVelocity === -1) return;
-                xVelocity = 1;
-                yVelocity = 0;
+                if (xVelocity !== -1) {
+                    xVelocity = 1;
+                    yVelocity = 0;
+                }
                 break;
         }
     });
