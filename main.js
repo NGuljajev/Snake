@@ -315,6 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (e.key) {
             case 'w':
+            case 'W':
             case 'ArrowUp':
                 if (yVelocity !== 1) {
                     xVelocity = 0;
@@ -322,6 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 's':
+            case 'S':
             case 'ArrowDown':
                 if (yVelocity !== -1) {
                     xVelocity = 0;
@@ -329,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 'a':
+            case 'A':
             case 'ArrowLeft':
                 if (xVelocity !== 1) {
                     xVelocity = -1;
@@ -336,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 break;
             case 'd':
+            case 'D':
             case 'ArrowRight':
                 if (xVelocity !== -1) {
                     xVelocity = 1;
