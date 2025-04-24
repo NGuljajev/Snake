@@ -271,3 +271,10 @@ body {
   color: #666;
   cursor: not-allowed;
 }
+
+#music-toggle {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}

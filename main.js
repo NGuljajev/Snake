@@ -83,10 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
             score += food.points;
             money = parseFloat((money + food.points * snakeColor.multiplier).toFixed(1));
 
-        
+
             scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
             moneyDisplay.textContent = `💰 Money: ${money.toFixed(1)}`;
-        
+
             if (score > bestScore) {
                 bestScore = Math.floor(score);
                 localStorage.setItem('bestScore', bestScore);
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             generateFood();
 
-            if (Math.floor(score) % 5 === 0 && gameSpeed > 50){
+            if (Math.floor(score) % 5 === 0 && gameSpeed > 50) {
                 gameSpeed -= 10;
                 clearInterval(gameLoop);
                 gameLoop = setInterval(updateGame, gameSpeed);
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateFood() {
-                const foodTypes = [
+        const foodTypes = [
             { name: 'redapple', emoji: '🍎', points: 1 },
             { name: 'watermelon', emoji: '🍉', points: 1 },
             { name: 'kiwi', emoji: '🥝', points: 1 },
@@ -289,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             shopMenu.appendChild(button);
         });
-    drawGame(); 
+        drawGame();
     }
 
 
@@ -367,3 +367,22 @@ document.addEventListener('DOMContentLoaded', () => {
     bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     moneyDisplay.textContent = `💰 Money: ${money}`;
 });
+
+// Music Control
+const bgMusic = document.getElementById('bg-music');
+const musicToggleBtn = document.getElementById('music-toggle');
+
+let isMuted = true;
+
+musicToggleBtn.addEventListener('click', () => {
+    isMuted = !isMuted;
+    bgMusic.muted = isMuted;
+    musicToggleBtn.textContent = isMuted ? '🔇 Music' : '🔊 Music';
+});
+
+// Optional: Unmute on first interaction (user gesture required)
+document.addEventListener('click', () => {
+    if (isMuted === false && bgMusic.paused) {
+        bgMusic.play();
+    }
+}, { once: true });

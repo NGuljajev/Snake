@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Snake Game</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
 </head>
 
 <body>
@@ -24,14 +23,15 @@
     </ul>
   </div>
 
-  <!-- Add this right after the game-rules div -->
+  <!-- Right Sidebar -->
   <div id="right-sidebar">
     <div id="money-display">💰 Money: 0</div>
     <button id="shop-btn">🛒 Shop</button>
     <div id="shop-menu" style="display: none;"></div>
+    <button id="music-toggle">🔇 Music</button>
   </div>
 
-  <!-- Game Container (Right Side) -->
+  <!-- Game Container -->
   <div id="game-container">
     <button id="start-btn">Start Game</button>
     <canvas id="game-canvas"></canvas>
@@ -46,7 +46,9 @@
     </div>
   </div>
 
+  <!-- Background Music -->
+  <audio id="bg-music" src="Sneaky-Snitch(chosic.com).mp3" loop autoplay muted></audio>
+
   <script src="main.js"></script>
 </body>
-
 </html>
