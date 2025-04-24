@@ -30,9 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const shop = [
         { name: 'Default', color: '#00FF00', multiplier: 1, cost: 0 },
-        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 1 },
-        { name: 'Blue', color: '#0000FF', multiplier: 1.5, cost: 100 },
-        { name: 'Gold', color: '#FFD700', multiplier: 2, cost: 150 },
+        { name: 'Red', color: '#FF0000', multiplier: 1.2, cost: 100 },
+        { name: 'Blue', color: '#0000FF', multiplier: 1.5, cost: 200 },
+        { name: 'Gold', color: '#FFD700', multiplier: 1.7, cost: 350 },
+        { name: 'Pink', color: '#f436ce', multiplier: 2, cost: 500 },
+        { name: 'Cyan', color: '#00FFFF', multiplier: 2.5, cost: 750 },
     ];
 
     let boughtColors = JSON.parse(localStorage.getItem('boughtColors')) || ['Default'];
