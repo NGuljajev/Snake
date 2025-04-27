@@ -80,9 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
         snake.unshift(head);
 
         if (head.x === food.x && head.y === food.y) {
+            playEatSound();
             score += food.points;
             money = parseFloat((money + food.points * snakeColor.multiplier).toFixed(1));
-
 
             scoreDisplay.textContent = `Score: ${Math.floor(score)}`;
             moneyDisplay.textContent = `💰 Money: ${money.toFixed(1)}`;
@@ -183,7 +183,24 @@ document.addEventListener('DOMContentLoaded', () => {
         food = newFood;
     }
 
+    function playCrashSound() {
+        crashSound.currentTime = 0;
+        crashSound.play();
+    }
+
+    function playClickSound() {
+        clickSound.currentTime = 0;
+        clickSound.play();
+    }
+
+    function playEatSound() {
+        eatSound.currentTime = 0;
+        eatSound.play();
+    }
+
     function gameOver() {
+        crashSound.currentTime = 0;
+        crashSound.play();
         gameRunning = false;
         clearInterval(gameLoop);
 
@@ -355,14 +372,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    startBtn.addEventListener('click', startGame);
-    restartBtn.addEventListener('click', startGame);
+    startBtn.addEventListener('click', () => {
+        playClickSound();
+        startGame();
+    });
+    
+    restartBtn.addEventListener('click', () => {
+        playClickSound();
+        startGame();
+    });
     resetBestBtn.addEventListener('click', () => {
         localStorage.removeItem('bestScore');
         bestScore = 0;
         bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     });
-    shopBtn.addEventListener('click', toggleShopMenu);
+    shopBtn.addEventListener('click', () => {
+        playClickSound();
+        toggleShopMenu();
+    });
 
     bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     moneyDisplay.textContent = `💰 Money: ${money}`;
@@ -378,6 +405,10 @@ musicToggleBtn.addEventListener('click', () => {
     isMuted = !isMuted;
     bgMusic.muted = isMuted;
     musicToggleBtn.textContent = isMuted ? '🔇 Music' : '🔊 Music';
+
+    if (!isMuted && bgMusic.paused) {
+        bgMusic.play();
+    }
 });
 
 // Optional: Unmute on first interaction (user gesture required)
@@ -386,3 +417,12 @@ document.addEventListener('click', () => {
         bgMusic.play();
     }
 }, { once: true });
+
+const eatSound = document.getElementById('eatSound');
+const crashSound = document.getElementById('crashSound');
+const clickSound = document.getElementById('clickSound');
+
+function playEatSound() {
+    eatSound.currentTime = 0;
+    eatSound.play();
+}
