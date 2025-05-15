@@ -45,10 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const achievements = [
         { id: 'firstBlood', name: 'First Bite', description: 'Eat your first food item', condition: () => score >= 1 },
         { id: 'fiver', name: 'Nom Nom x5', description: 'Score 5 points in one game', condition: () => score >= 5 },
-        { id: 'speedDemon', name: 'Speed Demon', description: 'Reach top speed (gameSpeed ≤ 50)', condition: () => gameSpeed <= 50 },
-        { id: 'rich', name: 'Big Spender', description: 'Accumulate 500 money', condition: () => money >= 500 },
-        { id: 'colorCollector', name: 'Color Collector', description: 'Buy 3 colors from shop', condition: () => boughtColors.filter(c => c !== 'Default').length >= 3 },
+        { id: 'rich', name: 'Big Spender', description: 'Accumulate 100 money', condition: () => money >= 100 },
         { id: 'perfectionist', name: 'Perfectionist', description: 'Beat your best score', condition: () => score > bestScore },
+        { id: 'colorCollector', name: 'Color Collector', description: 'Buy 3 colors from shop', condition: () => boughtColors.filter(c => c !== 'Default').length >= 3 },
+        { id: 'speedDemon', name: 'Speed Demon', description: 'Reach top speed (gameSpeed ≤ 50)', condition: () => gameSpeed <= 50 },
     ];
 
     function drawGame() {
@@ -339,3 +339,4 @@ function renderAchievements() {
 }
 
 localStorage.clear();
+let unlockedAchievements = JSON.parse(localStorage.getItem('achievements')) || [];
