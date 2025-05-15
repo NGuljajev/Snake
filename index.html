@@ -1,34 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <!-- Game Rules (Left Side) -->
+  <!-- Game Rules -->
   <div id="game-rules">
     <h2>🐍 How to Play</h2>
     <ul>
       <li><strong>Start Game:</strong> Click "Start Game" or press <kbd>Space</kbd>.</li>
-      <li><strong>Pause/Resume:</strong> Press <kbd>Space</kbd> again to pause or resume.</li>
+      <li><strong>Pause/Resume:</strong> Press <kbd>Space</kbd>.</li>
       <li><strong>Move:</strong> Use <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> or Arrow Keys.</li>
-      <li><strong>Collect Food:</strong> Eat items like 🍎, 🍭, 🍕, and more to score and grow.</li>
-      <li><strong>Avoid:</strong> Don’t hit the walls or yourself.</li>
-      <li><strong>Speed Up:</strong> Snake speeds up every 5 points.</li>
-      <li><strong>Best Score:</strong> Saved automatically.</li>
-      <li><strong>Reset:</strong> Click "Reset Best Score" to clear.</li>
+      <li><strong>Collect Food:</strong> Eat 🍕, 🍬, 🍇 and more to grow and score.</li>
+      <li><strong>Avoid:</strong> Don’t hit the wall or yourself.</li>
+      <li><strong>Speed Up:</strong> Speeds up every 5 points.</li>
     </ul>
   </div>
 
-  <!-- Right Sidebar -->
+  <!-- Sidebar -->
   <div id="right-sidebar">
     <div id="money-display">💰 Money: 0</div>
     <button id="shop-btn">🛒 Shop</button>
+    <button id="achievements-btn">🏅 Achievements</button>
     <div id="shop-menu" style="display: none;"></div>
+    <div id="achievements-menu" style="display: none;"></div>
     <button id="music-toggle">🔇 Music</button>
   </div>
 
@@ -47,15 +45,16 @@
     </div>
   </div>
 
-  <!-- Background Music -->
-  <audio id="bg-music" src="Sneaky-Snitch(chosic.com).mp3" loop autoplay muted></audio>
+  <!-- Achievement Toast -->
+  <div id="achievement-toast" style="display: none;"></div>
 
+  <!-- Audio -->
+  <audio id="bg-music" src="Sneaky-Snitch(chosic.com).mp3" loop autoplay muted></audio>
   <audio id="eatSound" src="eat.wav"></audio>
   <audio id="crashSound" src="Crashsound.mp3"></audio>
   <audio id="clickSound" src="Button_click.wav"></audio>
 
-
+  <!-- Script -->
   <script src="main.js"></script>
 </body>
-
 </html>
