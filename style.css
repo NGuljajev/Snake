@@ -249,6 +249,18 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+#shop-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 10px;
+  display: none;
+}
+
+#music-toggle {
+  min-width: 100px;
+}
+
 #shop-menu button {
   display: block;
   width: 100%;

@@ -121,10 +121,10 @@ document.addEventListener('DOMContentLoaded', () => {
         food = { x, y, emoji: emojis[Math.floor(Math.random() * emojis.length)], points: 1 };
     }
 
-    function checkAchievements(gameState) {
+    function checkAchievements() {
         achievements.forEach((ach) => {
-            if (!ach.unlocked && ach.condition(gameState)) {
-                ach.unlocked = true;
+            if (!unlockedAchievements.includes(ach.id) && ach.condition()) {
+                unlockedAchievements.push(ach.id);
                 showAchievementToast(ach.name);
                 saveAchievement(ach.id);
             }
@@ -309,15 +309,15 @@ document.addEventListener('click', () => {
 document.getElementById("achievements-btn").addEventListener("click", () => {
     const menu = document.getElementById("achievements-menu");
     if (menu.style.display === "none" || menu.style.display === "") {
-      renderAchievements();
-      menu.style.display = "block";
+        renderAchievements();
+        menu.style.display = "block";
     } else {
-      menu.style.display = "none";
+        menu.style.display = "none";
     }
-  });
-  
+});
 
-  function renderAchievements() {
+
+function renderAchievements() {
     const achievements = [
         { id: 'firstBlood', name: 'First Bite' },
         { id: 'fiver', name: 'Nom Nom x5' },
@@ -327,12 +327,13 @@ document.getElementById("achievements-btn").addEventListener("click", () => {
         { id: 'perfectionist', name: 'Perfectionist' },
     ];
     const unlocked = JSON.parse(localStorage.getItem("achievements")) || [];
-  
+
     const container = document.getElementById("achievements-menu");
     container.innerHTML = "<h3>Achievements</h3><ul>" +
-      achievements.map(ach =>
-        `<li>${unlocked.includes(ach.id) ? '✅' : '🔒'} ${ach.name}</li>`
-      ).join('') +
-      "</ul>";
-  }
-  
+        achievements.map(ach =>
+            `<li>${unlocked.includes(ach.id) ? '✅' : '🔒'} ${ach.name}</li>`
+        ).join('') +
+        "</ul>";
+}
+
+localStorage.clear();
