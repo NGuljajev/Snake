@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Snake Game</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <!-- Game Rules -->
   <div id="game-rules">
     <h2>🐍 How to Play</h2>
     <ul>
       <li><strong>Start Game:</strong> Click "Start Game" or press <kbd>Space</kbd>.</li>
-      <li><strong>Pause/Resume:</strong> Press <kbd>Space</kbd>.</li>
+      <li><strong>Pause/Resume:</strong> Press <kbd>Space</kbd> again to pause or resume.</li>
       <li><strong>Move:</strong> Use <kbd>W</kbd>, <kbd>A</kbd>, <kbd>S</kbd>, <kbd>D</kbd> or Arrow Keys.</li>
-      <li><strong>Collect Food:</strong> Eat 🍕, 🍬, 🍇 and more to grow and score.</li>
-      <li><strong>Avoid:</strong> Don’t hit the wall or yourself.</li>
-      <li><strong>Speed Up:</strong> Speeds up every 5 points.</li>
+      <li><strong>Collect Food:</strong> Eat items like 🍎, 🍭, 🍕, and more to score and grow.</li>
+      <li><strong>Avoid:</strong> Don’t hit the walls or yourself.</li>
+      <li><strong>Speed Up:</strong> Snake speeds up every 5 points.</li>
+      <li><strong>Best Score:</strong> Saved automatically.</li>
+      <li><strong>Reset:</strong> Click "Reset Best Score" to clear.</li>
     </ul>
   </div>
 
@@ -25,7 +29,7 @@
     <div id="money-display">💰 Money: 0</div>
     <button id="shop-btn">🛒 Shop</button>
     <button id="achievements-btn">🏅 Achievements</button>
-    <div id="shop-menu" style="display: none;"></div>
+    <div id="achievements-menu" style="display: none;"></div>
     <div id="achievements-menu" style="display: none;"></div>
     <button id="music-toggle">🔇 Music</button>
   </div>
@@ -57,4 +61,5 @@
   <!-- Script -->
   <script src="main.js"></script>
 </body>
+
 </html>

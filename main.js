@@ -23,12 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let yVelocity = 0;
     let score = 0;
     let bestScore = parseInt(localStorage.getItem('bestScore')) || 0;
-    let money = parseInt(localStorage.getItem('money')) || 0;
+    let money = parseFloat(localStorage.getItem('money')) || 0;
     let gameSpeed = 150;
     let gameLoop;
     let gameRunning = false;
     let unlockedAchievements = JSON.parse(localStorage.getItem('achievements')) || [];
-
 
     const shop = [
         { name: 'Default', color: '#00FF00', multiplier: 1, cost: 0 },
@@ -39,19 +38,18 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'Cyan', color: '#00FFFF', multiplier: 2.5, cost: 750 },
     ];
 
-    const achievements = [
-        { id: 'firstBlood', name: 'First Bite', description: 'Eat your first food item', condition: (score) => score >= 1 },
-        { id: 'fiver', name: 'Nom Nom x5', description: 'Score 5 points in one game', condition: (score) => score >= 5 },
-        { id: 'speedDemon', name: 'Speed Demon', description: 'Reach top speed (gameSpeed ≤ 50)', condition: () => gameSpeed <= 50 },
-        { id: 'rich', name: 'Big Spender', description: 'Accumulate 500 money', condition: () => money >= 500 },
-        { id: 'colorCollector', name: 'Color Collector', description: 'Buy 3 colors from shop', condition: () => boughtColors.length >= 4 },
-        { id: 'perfectionist', name: 'Perfectionist', description: 'Beat your best score', condition: () => score > bestScore },
-    ];
-    
-
     let boughtColors = JSON.parse(localStorage.getItem('boughtColors')) || ['Default'];
     let selectedColorName = localStorage.getItem('selectedColor') || 'Default';
     let snakeColor = shop.find(c => c.name === selectedColorName) || shop[0];
+
+    const achievements = [
+        { id: 'firstBlood', name: 'First Bite', description: 'Eat your first food item', condition: () => score >= 1 },
+        { id: 'fiver', name: 'Nom Nom x5', description: 'Score 5 points in one game', condition: () => score >= 5 },
+        { id: 'speedDemon', name: 'Speed Demon', description: 'Reach top speed (gameSpeed ≤ 50)', condition: () => gameSpeed <= 50 },
+        { id: 'rich', name: 'Big Spender', description: 'Accumulate 500 money', condition: () => money >= 500 },
+        { id: 'colorCollector', name: 'Color Collector', description: 'Buy 3 colors from shop', condition: () => boughtColors.filter(c => c !== 'Default').length >= 3 },
+        { id: 'perfectionist', name: 'Perfectionist', description: 'Beat your best score', condition: () => score > bestScore },
+    ];
 
     function drawGame() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -74,29 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText(food.emoji, food.x * gridSize + gridSize / 2, food.y * gridSize + gridSize / 2);
     }
 
-    function checkAchievements() {
-        achievements.forEach(ach => {
-            if (!unlockedAchievements.includes(ach.id) && ach.condition(score)) {
-                unlockedAchievements.push(ach.id);
-                localStorage.setItem('achievements', JSON.stringify(unlockedAchievements));
-                showAchievementNotification(ach);
-            }
-        });
-    }    
-
     function moveSnake() {
         const head = { x: snake[0].x + xVelocity, y: snake[0].y + yVelocity };
 
-        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
-            gameOver();
-            return;
-        }
+        if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) return gameOver();
 
         for (let segment of snake) {
-            if (head.x === segment.x && head.y === segment.y) {
-                gameOver();
-                return;
-            }
+            if (head.x === segment.x && head.y === segment.y) return gameOver();
         }
 
         snake.unshift(head);
@@ -115,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 bestScoreDisplay.textContent = `Best: ${bestScore}`;
             }
 
+            checkAchievements();
             generateFood();
 
             if (Math.floor(score) % 5 === 0 && gameSpeed > 50) {
@@ -128,110 +111,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function generateFood() {
-        const foodTypes = [
-            { name: 'redapple', emoji: '🍎', points: 1 },
-            { name: 'watermelon', emoji: '🍉', points: 1 },
-            { name: 'kiwi', emoji: '🥝', points: 1 },
-            { name: 'grapes', emoji: '🍇', points: 1 },
-            { name: 'melon', emoji: '🍈', points: 1 },
-            { name: 'lemon', emoji: '🍋', points: 1 },
-            { name: 'orange', emoji: '🍊', points: 1 },
-            { name: 'lime', emoji: '🍋‍🟩', points: 1 },
-            { name: 'banana', emoji: '🍌', points: 1 },
-            { name: 'pineapple', emoji: '🍍', points: 1 },
-            { name: 'mango', emoji: '🥭', points: 1 },
-            { name: 'greenapple', emoji: '🍏', points: 1 },
-            { name: 'pear', emoji: '🍐', points: 1 },
-            { name: 'peach', emoji: '🍑', points: 1 },
-            { name: 'cherries', emoji: '🍒', points: 1 },
-            { name: 'strawberry', emoji: '🍓', points: 1 },
-            { name: 'blueberries', emoji: '🫐', points: 1 },
-            { name: 'tomato', emoji: '🍅', points: 1 },
-            { name: 'olive', emoji: '🫒', points: 1 },
-            { name: 'coconut', emoji: '🥥', points: 1 },
+        const emojis = ['🍎', '🍉', '🥝', '🍇', '🍌', '🍍', '🥑', '🥕', '🍕', '🍫', '🍪', '🍰', '🍩'];
+        let x, y, overlap;
+        do {
+            x = Math.floor(Math.random() * tileCount);
+            y = Math.floor(Math.random() * tileCount);
+            overlap = snake.some(segment => segment.x === x && segment.y === y);
+        } while (overlap);
+        food = { x, y, emoji: emojis[Math.floor(Math.random() * emojis.length)], points: 1 };
+    }
 
-            // vegetables
-            { name: 'avocado', emoji: '🥑', points: 1 },
-            { name: 'eggplant', emoji: '🍆', points: 1 },
-            { name: 'potato', emoji: '🥔', points: 1 },
-            { name: 'carrot', emoji: '🥕', points: 1 },
-            { name: 'corn', emoji: '🌽', points: 1 },
-            { name: 'hotpepper', emoji: '🌶️', points: 1 },
-            { name: 'bellpepper', emoji: '🫑', points: 1 },
-            { name: 'cucumber', emoji: '🥒', points: 1 },
-            { name: 'leafygreen', emoji: '🥬', points: 1 },
-            { name: 'broccoli', emoji: '🥦', points: 1 },
-            { name: 'garlic', emoji: '🧄', points: 1 },
-            { name: 'peanuts', emoji: '🥜', points: 1 },
-            { name: 'beans', emoji: '🫘', points: 1 },
-            { name: 'chestnut', emoji: '🌰', points: 1 },
-            { name: 'gingerroot', emoji: '🫚', points: 1 },
-            { name: 'peapod', emoji: '🫛', points: 1 },
-            { name: 'brownmushroom', emoji: '🍄‍🟫', points: 1 },
-
-            // prepared foods
-            { name: 'pizza', emoji: '🍕', points: 1 },
-
-            //sweets
-            { name: 'chocolate', emoji: '🍫', points: 1 },
-            { name: 'candy', emoji: '🍬', points: 1 },
-            { name: 'cake', emoji: '🍰', points: 1 },
-            { name: 'softicecream', emoji: '🍦', points: 1 },
-            { name: 'cookie', emoji: '🍪', points: 1 },
-            { name: 'pudding', emoji: '🍮', points: 1 },
-            { name: 'doughnut', emoji: '🍩', points: 1 },
-            { name: 'lollipop', emoji: '🍭', points: 1 },
-            { name: 'shavedice', emoji: '🍧', points: 1 },
-            { name: 'icecream', emoji: '🍨', points: 1 },
-            { name: 'birthdaycake', emoji: '🎂', points: 1 },
-            { name: 'cupcake', emoji: '🧁', points: 1 },
-            { name: 'pie', emoji: '🥧', points: 1 },
-            { name: 'honeypot', emoji: '🍯', points: 1 },
-        ];
-
-        let type = foodTypes[Math.floor(Math.random() * foodTypes.length)];
-        let newFood = {
-            ...type,
-            x: Math.floor(Math.random() * tileCount),
-            y: Math.floor(Math.random() * tileCount),
-        };
-
-        for (let segment of snake) {
-            if (segment.x === newFood.x && segment.y === newFood.y) {
-                return generateFood();
+    function checkAchievements(gameState) {
+        achievements.forEach((ach) => {
+            if (!ach.unlocked && ach.condition(gameState)) {
+                ach.unlocked = true;
+                showAchievementToast(ach.name);
+                saveAchievement(ach.id);
             }
+        });
+    }
+
+    function showAchievementToast(name) {
+        const toast = document.getElementById("achievement-toast");
+        toast.textContent = `🏆 Achievement Unlocked: ${name}`;
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 3000);
+    }
+
+    function saveAchievement(id) {
+        const unlocked = JSON.parse(localStorage.getItem("achievements")) || [];
+        if (!unlocked.includes(id)) {
+            unlocked.push(id);
+            localStorage.setItem("achievements", JSON.stringify(unlocked));
         }
-
-        food = newFood;
-    }
-
-    function playCrashSound() {
-        crashSound.currentTime = 0;
-        crashSound.play();
-    }
-
-    function playClickSound() {
-        clickSound.currentTime = 0;
-        clickSound.play();
-    }
-
-    function playEatSound() {
-        eatSound.currentTime = 0;
-        eatSound.play();
     }
 
     function gameOver() {
-        crashSound.currentTime = 0;
-        crashSound.play();
+        playCrashSound();
         gameRunning = false;
         clearInterval(gameLoop);
-
         gameOverDisplay.style.display = 'flex';
         restartBtn.style.display = 'block';
-
         document.getElementById('final-score').textContent = `Your Score: ${score}`;
         document.getElementById('best-score-end').textContent = `Best Score: ${bestScore}`;
-
         localStorage.setItem('money', money);
     }
 
@@ -242,17 +164,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    checkAchievements();
-
     function startGame() {
         snake = [{ x: 10, y: 10 }];
         xVelocity = 1;
         yVelocity = 0;
         score = 0;
-        scoreDisplay.textContent = `Score: ${score}`;
-        bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
         gameSpeed = 150;
         gameRunning = true;
+        gamePaused = false;
+
+        scoreDisplay.textContent = `Score: ${score}`;
+        bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
         gameOverDisplay.style.display = 'none';
         restartBtn.style.display = 'none';
         startBtn.style.display = 'none';
@@ -265,7 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function togglePause() {
         gamePaused = !gamePaused;
-
         if (gamePaused) {
             clearInterval(gameLoop);
             drawPauseScreen();
@@ -287,170 +208,131 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateShopMenu() {
         shopMenu.innerHTML = '<h3>Snake Colors</h3>';
-
-        shop.forEach((item) => {
-            const button = document.createElement('button');
+        shop.forEach(item => {
+            const btn = document.createElement('button');
             const owned = boughtColors.includes(item.name);
             const selected = snakeColor.name === item.name;
             const affordable = money >= item.cost;
 
-            button.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
-            button.style.backgroundColor = item.color;
+            btn.textContent = `${item.name} - ${item.cost} 💰 (x${item.multiplier})`;
+            btn.style.backgroundColor = item.color;
 
             if (selected) {
-                button.disabled = true;
-                button.textContent += ' ✔️';
-                button.style.cursor = 'not-allowed';
-                button.style.opacity = '0.6';
+                btn.disabled = true;
+                btn.textContent += ' ✔️';
+                btn.style.cursor = 'not-allowed';
+                btn.style.opacity = '0.6';
             }
-
             if (!owned && !affordable) {
-                button.disabled = true;
-                button.style.cursor = 'not-allowed';
-                button.style.opacity = '0.6';
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+                btn.style.opacity = '0.6';
             }
 
-            button.addEventListener('click', () => {
+            btn.addEventListener('click', () => {
                 if (!owned && !affordable) return;
-
                 if (!owned) {
                     money -= item.cost;
                     boughtColors.push(item.name);
                     localStorage.setItem('boughtColors', JSON.stringify(boughtColors));
                 }
-
                 snakeColor = item;
                 localStorage.setItem('selectedColor', item.name);
-                moneyDisplay.textContent = `💰 Money: ${money}`;
+                moneyDisplay.textContent = `💰 Money: ${money.toFixed(1)}`;
                 populateShopMenu();
             });
 
-            shopMenu.appendChild(button);
+            shopMenu.appendChild(btn);
         });
-
-        drawGame(); // redraw game visuals (snake, food)
-
-        // ✅ Fix: If game is paused, redraw the pause overlay
-        if (gamePaused) {
-            drawPauseScreen();
-        }
+        drawGame();
+        if (gamePaused) drawPauseScreen();
     }
-
-
 
     function toggleShopMenu() {
-        if (shopMenu.style.display === 'none' || shopMenu.style.display === '') {
-            populateShopMenu();
-            shopMenu.style.display = 'block';
-        } else {
-            shopMenu.style.display = 'none';
-        }
+        shopMenu.style.display = (shopMenu.style.display === 'block') ? 'none' : 'block';
+        if (shopMenu.style.display === 'block') populateShopMenu();
     }
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', e => {
         if (e.key === ' ' || e.key === 'Space') {
-            if (!gameRunning) {
-                startGame();
-            } else {
-                togglePause();
-            }
+            if (!gameRunning) startGame();
+            else togglePause();
         }
-
         if (!gameRunning || gamePaused) return;
-
         switch (e.key) {
-            case 'w':
-            case 'W':
-            case 'ArrowUp':
-                if (yVelocity !== 1) {
-                    xVelocity = 0;
-                    yVelocity = -1;
-                }
-                break;
-            case 's':
-            case 'S':
-            case 'ArrowDown':
-                if (yVelocity !== -1) {
-                    xVelocity = 0;
-                    yVelocity = 1;
-                }
-                break;
-            case 'a':
-            case 'A':
-            case 'ArrowLeft':
-                if (xVelocity !== 1) {
-                    xVelocity = -1;
-                    yVelocity = 0;
-                }
-                break;
-            case 'd':
-            case 'D':
-            case 'ArrowRight':
-                if (xVelocity !== -1) {
-                    xVelocity = 1;
-                    yVelocity = 0;
-                }
-                break;
+            case 'ArrowUp': case 'w': if (yVelocity !== 1) { xVelocity = 0; yVelocity = -1; } break;
+            case 'ArrowDown': case 's': if (yVelocity !== -1) { xVelocity = 0; yVelocity = 1; } break;
+            case 'ArrowLeft': case 'a': if (xVelocity !== 1) { xVelocity = -1; yVelocity = 0; } break;
+            case 'ArrowRight': case 'd': if (xVelocity !== -1) { xVelocity = 1; yVelocity = 0; } break;
         }
     });
 
-    document.addEventListener('click', (e) => {
-        if (!shopBtn.contains(e.target) && !shopMenu.contains(e.target)) {
-            shopMenu.style.display = 'none';
-        }
+    document.addEventListener('click', e => {
+        if (!shopBtn.contains(e.target) && !shopMenu.contains(e.target)) shopMenu.style.display = 'none';
     });
 
-    startBtn.addEventListener('click', () => {
-        playClickSound();
-        startGame();
-    });
-
-    restartBtn.addEventListener('click', () => {
-        playClickSound();
-        startGame();
-    });
+    startBtn.addEventListener('click', () => { playClickSound(); startGame(); });
+    restartBtn.addEventListener('click', () => { playClickSound(); startGame(); });
     resetBestBtn.addEventListener('click', () => {
         localStorage.removeItem('bestScore');
         bestScore = 0;
         bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
     });
-    shopBtn.addEventListener('click', () => {
-        playClickSound();
-        toggleShopMenu();
-    });
+    shopBtn.addEventListener('click', () => { playClickSound(); toggleShopMenu(); });
 
     bestScoreDisplay.textContent = `🏆 Best: ${bestScore}`;
-    moneyDisplay.textContent = `💰 Money: ${money}`;
+    moneyDisplay.textContent = `💰 Money: ${money.toFixed(1)}`;
 });
 
-// Music Control
+const eatSound = document.getElementById('eatSound');
+const crashSound = document.getElementById('crashSound');
+const clickSound = document.getElementById('clickSound');
 const bgMusic = document.getElementById('bg-music');
 const musicToggleBtn = document.getElementById('music-toggle');
-
 let isMuted = true;
+
+function playEatSound() { eatSound.currentTime = 0; eatSound.play(); }
+function playCrashSound() { crashSound.currentTime = 0; crashSound.play(); }
+function playClickSound() { clickSound.currentTime = 0; clickSound.play(); }
 
 musicToggleBtn.addEventListener('click', () => {
     isMuted = !isMuted;
     bgMusic.muted = isMuted;
     musicToggleBtn.textContent = isMuted ? '🔇 Music' : '🔊 Music';
-
-    if (!isMuted && bgMusic.paused) {
-        bgMusic.play();
-    }
+    if (!isMuted && bgMusic.paused) bgMusic.play();
 });
 
-// Optional: Unmute on first interaction (user gesture required)
 document.addEventListener('click', () => {
-    if (isMuted === false && bgMusic.paused) {
-        bgMusic.play();
-    }
+    if (!isMuted && bgMusic.paused) bgMusic.play();
 }, { once: true });
 
-const eatSound = document.getElementById('eatSound');
-const crashSound = document.getElementById('crashSound');
-const clickSound = document.getElementById('clickSound');
+document.getElementById("achievements-btn").addEventListener("click", () => {
+    const menu = document.getElementById("achievements-menu");
+    if (menu.style.display === "none" || menu.style.display === "") {
+      renderAchievements();
+      menu.style.display = "block";
+    } else {
+      menu.style.display = "none";
+    }
+  });
+  
 
-function playEatSound() {
-    eatSound.currentTime = 0;
-    eatSound.play();
-}
+  function renderAchievements() {
+    const achievements = [
+        { id: 'firstBlood', name: 'First Bite' },
+        { id: 'fiver', name: 'Nom Nom x5' },
+        { id: 'speedDemon', name: 'Speed Demon' },
+        { id: 'rich', name: 'Big Spender' },
+        { id: 'colorCollector', name: 'Color Collector' },
+        { id: 'perfectionist', name: 'Perfectionist' },
+    ];
+    const unlocked = JSON.parse(localStorage.getItem("achievements")) || [];
+  
+    const container = document.getElementById("achievements-menu");
+    container.innerHTML = "<h3>Achievements</h3><ul>" +
+      achievements.map(ach =>
+        `<li>${unlocked.includes(ach.id) ? '✅' : '🔒'} ${ach.name}</li>`
+      ).join('') +
+      "</ul>";
+  }
+  
