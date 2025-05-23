@@ -96,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('bestScore', bestScore);
                 bestScoreDisplay.textContent = `Best: ${bestScore}`;
             }
-
             checkAchievements();
             generateFood();
 
@@ -338,5 +337,5 @@ function renderAchievements() {
         "</ul>";
 }
 
-localStorage.clear();
+//localStorage.clear();
 let unlockedAchievements = JSON.parse(localStorage.getItem('achievements')) || [];
